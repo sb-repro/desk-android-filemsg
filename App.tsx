@@ -4,115 +4,113 @@
  *
  * @format
  */
+import {Text, TouchableOpacity} from 'react-native';
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import * as imagePicker from 'react-native-image-picker';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import SendbirdChat from '@sendbird/chat';
+import SendBirdDesk, {Ticket} from 'sendbird-desk';
+import {GroupChannelModule} from '@sendbird/chat/groupChannel';
+import {useEffect} from 'react';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
-
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
-
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+async function connectDesk() {
+  const params = {
+    appId: '1322FB2D-0003-4318-8225-301A6DA0C69F',
+    modules: [new GroupChannelModule()],
   };
-
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
+  const sb = SendbirdChat.init(params);
+  try {
+    await sb.connect('test');
+    SendBirdDesk.init(sb as any);
+    SendBirdDesk.authenticate(
+      'test',
+      // authentication callback
+      () => {
+        console.log('desk connected');
+      },
+    );
+  } catch (error) {
+    console.log('desk connect failure', error);
+  }
 }
 
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
+const App = () => {
+  useEffect(() => {
+    connectDesk();
+  }, []);
+
+  return (
+    <TouchableOpacity
+      onPress={async () => {
+        const {assets} = await imagePicker.launchImageLibrary({
+          presentationStyle: 'fullScreen',
+          selectionLimit: 1,
+          mediaType: 'photo',
+        });
+
+        const asset = (assets ?? [])[0];
+        if (asset) {
+          Ticket.create('TICKET_TITLE', 'USER_NAME', (ticket, error) => {
+            if (error) {
+              console.log('ticket creation failure', error);
+              // Handle error.
+            } else if (ticket) {
+              console.log('ticket created', ticket.id);
+
+              SendBirdDesk.setCustomerCustomFields(
+                {
+                  custom: 'field',
+                },
+                (res, err) => {
+                  if (res) {
+                    console.log('custom fields set');
+                    ticket.channel
+                      .sendUserMessage({
+                        message: 'initial message',
+                      })
+                      .onSucceeded(() => {
+                        console.log('initial message sent');
+                        if (asset.uri && asset.type) {
+                          ticket.channel
+                            .sendFileMessages([
+                              {
+                                file: {
+                                  uri: asset.uri,
+                                  name: asset.fileName || 'filename',
+                                  type: asset.type,
+                                },
+                              },
+                            ])
+                            .onSucceeded(m => {
+                              console.log('file message succeeded', m);
+                            })
+                            .onFailed(error => {
+                              console.log('file message failed', error);
+                            })
+                            .onPending(() => {
+                              console.log('file message pending...');
+                            });
+                        }
+                      });
+                  } else {
+                    console.log('custom fields set failure', err);
+                  }
+                },
+              );
+            }
+          });
+        }
+      }}
+      style={{
+        width: 200,
+        height: 50,
+        borderWidth: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+      <Text>{'Press please '}</Text>
+    </TouchableOpacity>
+  );
+};
 
 export default App;
