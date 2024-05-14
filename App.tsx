@@ -1,116 +1,191 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-import {Text, TouchableOpacity} from 'react-native';
+import React, {useState} from 'react';
+import {Text, TouchableOpacity, View} from 'react-native';
 
 import * as imagePicker from 'react-native-image-picker';
 
 import SendbirdChat from '@sendbird/chat';
 import SendBirdDesk, {Ticket} from 'sendbird-desk';
-import {GroupChannelModule} from '@sendbird/chat/groupChannel';
-import {useEffect} from 'react';
+import {GroupChannel, GroupChannelModule} from '@sendbird/chat/groupChannel';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import {
+  createGroupChannelFragment,
+  SendbirdUIKitContainer,
+  useConnection,
+} from '@sendbird/uikit-react-native';
 
+const userid = 'test';
+const appid = '1322FB2D-0003-4318-8225-301A6DA0C69F';
 async function connectDesk() {
-  const params = {
-    appId: '1322FB2D-0003-4318-8225-301A6DA0C69F',
-    modules: [new GroupChannelModule()],
-  };
-  const sb = SendbirdChat.init(params);
-  try {
-    await sb.connect('test');
-    SendBirdDesk.init(sb as any);
-    SendBirdDesk.authenticate(
-      'test',
-      // authentication callback
-      () => {
-        console.log('desk connected');
-      },
-    );
-  } catch (error) {
-    console.log('desk connect failure', error);
-  }
+  return new Promise<void>(async (resolve, reject) => {
+    const sb = SendbirdChat.init({
+      appId: appid,
+      modules: [new GroupChannelModule()],
+      localCacheEnabled: true,
+      useAsyncStorageStore: AsyncStorage,
+    });
+    try {
+      await sb.connect(userid);
+      SendBirdDesk.init(sb as any);
+      SendBirdDesk.authenticate(
+        userid,
+        // authentication callback
+        () => {
+          console.log('desk connected');
+          resolve();
+        },
+      );
+    } catch (error) {
+      console.log('desk connect failure', error);
+      reject(error);
+    }
+  });
 }
 
 const App = () => {
-  useEffect(() => {
-    connectDesk();
-  }, []);
+  const [channel, setChannel] = useState<GroupChannel>();
 
   return (
-    <TouchableOpacity
-      onPress={async () => {
-        const {assets} = await imagePicker.launchImageLibrary({
-          presentationStyle: 'fullScreen',
-          selectionLimit: 1,
-          mediaType: 'photo',
-        });
-
-        const asset = (assets ?? [])[0];
-        if (asset) {
-          Ticket.create('TICKET_TITLE', 'USER_NAME', (ticket, error) => {
-            if (error) {
-              console.log('ticket creation failure', error);
-              // Handle error.
-            } else if (ticket) {
-              console.log('ticket created', ticket.id);
-
-              SendBirdDesk.setCustomerCustomFields(
-                {
-                  custom: 'field',
-                },
-                (res, err) => {
-                  if (res) {
-                    console.log('custom fields set');
-                    ticket.channel
-                      .sendUserMessage({
-                        message: 'initial message',
-                      })
-                      .onSucceeded(() => {
-                        console.log('initial message sent');
-                        if (asset.uri && asset.type) {
-                          ticket.channel
-                            .sendFileMessages([
-                              {
-                                file: {
-                                  uri: asset.uri,
-                                  name: asset.fileName || 'filename',
-                                  type: asset.type,
-                                },
-                              },
-                            ])
-                            .onSucceeded(m => {
-                              console.log('file message succeeded', m);
-                            })
-                            .onFailed(error => {
-                              console.log('file message failed', error);
-                            })
-                            .onPending(() => {
-                              console.log('file message pending...');
-                            });
-                        }
-                      });
-                  } else {
-                    console.log('custom fields set failure', err);
-                  }
-                },
-              );
-            }
-          });
-        }
-      }}
-      style={{
-        width: 200,
-        height: 50,
-        borderWidth: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
+    <SendbirdUIKitContainer
+      appId={appid}
+      userProfile={{onCreateChannel() {}}}
+      platformServices={
+        {
+          media: {},
+          file: {},
+          player: {
+            reset() {},
+          },
+          recorder: {
+            reset() {},
+            options: {
+              minDuration: 0,
+            },
+          },
+          notification: {},
+        } as any
+      }
+      chatOptions={{
+        localCacheStorage: AsyncStorage,
+        enableAutoPushTokenRegistration: false,
       }}>
-      <Text>{'Press please '}</Text>
-    </TouchableOpacity>
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: 'gray',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+        <View style={{flexDirection: 'row', gap: 8}}>
+          <Buttons onSetChannel={setChannel} />
+        </View>
+        {channel && (
+          <GroupChannelFragment
+            channel={channel}
+            onChannelDeleted={() => {}}
+            onPressHeaderLeft={() => setChannel(undefined)}
+            onPressHeaderRight={() => {}}
+          />
+        )}
+      </View>
+    </SendbirdUIKitContainer>
   );
 };
+const Buttons = ({onSetChannel}: any) => {
+  const {connect: connectUIKit} = useConnection();
+  return (
+    <>
+      <TouchableOpacity
+        style={{
+          flex: 1,
+          height: 50,
+          backgroundColor: 'white',
+          borderWidth: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+        onPress={async () => {
+          await connectDesk();
+          await connectUIKit(userid);
+        }}>
+        <Text>{'Connect'}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={{
+          flex: 1,
+          height: 50,
+          backgroundColor: 'white',
+          borderWidth: 1,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+        onPress={async () => {
+          const {assets} = await imagePicker.launchImageLibrary({
+            presentationStyle: 'fullScreen',
+            selectionLimit: 1,
+            mediaType: 'photo',
+          });
+
+          const asset = (assets ?? [])[0];
+          if (asset) {
+            Ticket.create('TICKET_TITLE', 'USER_NAME', (ticket, error) => {
+              if (error) {
+                console.log('ticket creation failure', error);
+                // Handle error.
+              } else if (ticket) {
+                console.log('ticket created', ticket.id);
+
+                SendBirdDesk.setCustomerCustomFields(
+                  {
+                    custom: 'field',
+                  },
+                  (res, err) => {
+                    if (res) {
+                      console.log('custom fields set');
+                      ticket.channel
+                        .sendUserMessage({
+                          message: 'initial message',
+                        })
+                        .onSucceeded(() => {
+                          console.log('initial message sent');
+                          if (asset.uri && asset.type) {
+                            ticket.channel
+                              .sendFileMessages([
+                                {
+                                  file: {
+                                    uri: asset.uri,
+                                    name: asset.fileName || 'filename',
+                                    type: asset.type,
+                                  },
+                                },
+                              ])
+                              .onSucceeded(m => {
+                                console.log('file message succeeded', m);
+                                onSetChannel(ticket.channel);
+                              })
+                              .onFailed(error => {
+                                console.log('file message failed', error);
+                                onSetChannel(ticket.channel);
+                              })
+                              .onPending(() => {
+                                console.log('file message pending...');
+                                onSetChannel(ticket.channel);
+                              });
+                          }
+                        });
+                    } else {
+                      console.log('custom fields set failure', err);
+                    }
+                  },
+                );
+              }
+            });
+          }
+        }}>
+        <Text>{'Create ticket and open channel'}</Text>
+      </TouchableOpacity>
+    </>
+  );
+};
+const GroupChannelFragment = createGroupChannelFragment();
 
 export default App;

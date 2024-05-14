@@ -1125,7 +1125,7 @@
   resolved "https://registry.yarnpkg.com/@babel/regjsgen/-/regjsgen-0.8.0.tgz#f0ba69b075e1f05fb2825b7fad991e7adbb18310"
   integrity sha512-x/rqGMdzj+fWZvCOYForTghzbtqPDZ5gPwaoNGHdgDfF2QA/XZbCBp4Moo5scrkAMPhB7z26XM/AaHuIJdgauA==
 
-"@babel/runtime@^7.0.0", "@babel/runtime@^7.20.0", "@babel/runtime@^7.8.4":
+"@babel/runtime@^7.0.0", "@babel/runtime@^7.20.0", "@babel/runtime@^7.21.0", "@babel/runtime@^7.8.4":
   version "7.24.5"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.24.5.tgz#230946857c053a36ccc66e1dd03b17dd0c4ed02c"
   integrity sha512-Nms86NXrsaeU9vbBJKni6gXiEXZ4CVpYVzEjDH9Sb8vmZ3UljyA1GSOJl/6LGPO8EHLuSF9H+IxNXHPX8QHJ4g==
@@ -1533,6 +1533,13 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@openspacelabs/react-native-zoomable-view@^2.1.5":
+  version "2.1.6"
+  resolved "https://registry.sendbird.com/@openspacelabs%2freact-native-zoomable-view/-/react-native-zoomable-view-2.1.6.tgz#4ff8d06ba820818cd0a5f6d505d79a2c6db2ce9a"
+  integrity sha512-Eb8ro4a1DGkVBT9xIl7RQHSlpKQD7q62JeVXJKtLKZIZ+FNHDVfLGxwyeqUMevLHbBUTbAqX9+zsgOMk/mrHWg==
+  dependencies:
+    prop-types "^15.7.2"
+
 "@react-native-async-storage/async-storage@^1.15.17":
   version "1.23.1"
   resolved "https://registry.yarnpkg.com/@react-native-async-storage/async-storage/-/async-storage-1.23.1.tgz#cad3cd4fab7dacfe9838dce6ecb352f79150c883"
@@ -1899,6 +1906,44 @@
   version "4.12.3"
   resolved "https://registry.sendbird.com/@sendbird%2fchat/-/chat-4.12.3.tgz#239cdeb81750ba9f12ec70888ac6a59657f8aa90"
   integrity sha512-i2oUJnOzmoWK55IZxuyoYrxzQwkyqHkW4WzKoIrYveTPliMWsbLuCGOx4SI1smuLV9Pdz26rCwCCw8Gfoti8zg==
+
+"@sendbird/uikit-chat-hooks@3.5.2":
+  version "3.5.2"
+  resolved "https://registry.sendbird.com/@sendbird%2fuikit-chat-hooks/-/uikit-chat-hooks-3.5.2.tgz#0997b60e107173e135106afa2102a0b691ce4913"
+  integrity sha512-TQtzD19DintdwhnZMbW0fjuZp8ysipqkVDwU3NQpvadJIjB70SMM/7D/K+cy+Jg/ZbrxyAzGi7pFtGobcUdhqw==
+  dependencies:
+    "@sendbird/uikit-utils" "3.5.2"
+
+"@sendbird/uikit-react-native-foundation@3.5.2":
+  version "3.5.2"
+  resolved "https://registry.sendbird.com/@sendbird%2fuikit-react-native-foundation/-/uikit-react-native-foundation-3.5.2.tgz#2d31fb13c638add96cb56f5ba7a251d9ea2d2f17"
+  integrity sha512-zki6oR2zSSCSJD3fX7Fr7AGWjcEbvlCdXOl7oK3ioriymEDWCdeWDS8GwFDzup5jpO4zB3Lm6fGEULTwkJYkmg==
+  dependencies:
+    "@sendbird/uikit-utils" "3.5.2"
+
+"@sendbird/uikit-react-native@^3.5.2":
+  version "3.5.2"
+  resolved "https://registry.sendbird.com/@sendbird%2fuikit-react-native/-/uikit-react-native-3.5.2.tgz#6dd7fc97cf12b8c869d54a4b24d089faf000d1f8"
+  integrity sha512-EjOnsD3NMAp+f2egzg0VNuDecxK7g1o+3x84bBZKb1b3CpQL9CqDFODWN5f7T57vWe3Qun+BxRGq8vbFnKlU5A==
+  dependencies:
+    "@openspacelabs/react-native-zoomable-view" "^2.1.5"
+    "@sendbird/uikit-chat-hooks" "3.5.2"
+    "@sendbird/uikit-react-native-foundation" "3.5.2"
+    "@sendbird/uikit-tools" "0.0.1-alpha.66"
+    "@sendbird/uikit-utils" "3.5.2"
+
+"@sendbird/uikit-tools@0.0.1-alpha.66":
+  version "0.0.1-alpha.66"
+  resolved "https://registry.sendbird.com/@sendbird%2fuikit-tools/-/uikit-tools-0.0.1-alpha.66.tgz#5328f1768c130b15cdec9f0ab9f21d2da269ba62"
+  integrity sha512-IE8HHqTcAVunnVhcfsxQCRmOoCNHx3c8ZP3eZeqYJB876DrnM38ne5TZVao2ZFSmbiZZQ7xc9DClEiZuZUgvnQ==
+
+"@sendbird/uikit-utils@3.5.2":
+  version "3.5.2"
+  resolved "https://registry.sendbird.com/@sendbird%2fuikit-utils/-/uikit-utils-3.5.2.tgz#d5fd98acc50de05558ee27bdd7bb48f4bc28276f"
+  integrity sha512-ch+AGBHAeKo7OCMBa3xW7m1R5FzuSEjQLCmC8TEham4igoGP6Zn7A4qo1bg/BI7okQgMMFB6moODnjxDT+STkQ==
+  dependencies:
+    date-fns "^2.28.0"
+    string.prototype.matchall "^4.0.7"
 
 "@sideway/address@^4.1.5":
   version "4.1.5"
@@ -2932,6 +2977,13 @@ data-view-byte-offset@^1.0.0:
     call-bind "^1.0.6"
     es-errors "^1.3.0"
     is-data-view "^1.0.1"
+
+date-fns@^2.28.0:
+  version "2.30.0"
+  resolved "https://registry.sendbird.com/date-fns/-/date-fns-2.30.0.tgz#f367e644839ff57894ec6ac480de40cae4b0f4d0"
+  integrity sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==
+  dependencies:
+    "@babel/runtime" "^7.21.0"
 
 dayjs@^1.8.15:
   version "1.11.11"
@@ -5587,7 +5639,7 @@ prompts@^2.0.1, prompts@^2.4.2:
     kleur "^3.0.3"
     sisteransi "^1.0.5"
 
-prop-types@^15.8.1:
+prop-types@^15.7.2, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
   integrity sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==
@@ -5655,6 +5707,11 @@ react-native-image-picker@^7.1.2:
   version "7.1.2"
   resolved "https://registry.sendbird.com/react-native-image-picker/-/react-native-image-picker-7.1.2.tgz#383849d1953caf4578874a1f5e5dd11c737bd5cd"
   integrity sha512-b5y5nP60RIPxlAXlptn2QwlIuZWCUDWa/YPUVjgHc0Ih60mRiOg1PSzf0IjHSLeOZShCpirpvSPGnDExIpTRUg==
+
+react-native-safe-area-context@^4.10.1:
+  version "4.10.1"
+  resolved "https://registry.sendbird.com/react-native-safe-area-context/-/react-native-safe-area-context-4.10.1.tgz#29fb27395ff7dfa2fa38788a27226330d73a81cc"
+  integrity sha512-w8tCuowDorUkPoWPXmhqosovBr33YsukkwYCDERZFHAxIkx6qBadYxfeoaJ91nCQKjkNzGrK5qhoNOeSIcYSpA==
 
 react-native@0.74.1:
   version "0.74.1"
@@ -6210,7 +6267,7 @@ string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.3:
     is-fullwidth-code-point "^3.0.0"
     strip-ansi "^6.0.1"
 
-string.prototype.matchall@^4.0.10:
+string.prototype.matchall@^4.0.10, string.prototype.matchall@^4.0.7:
   version "4.0.11"
   resolved "https://registry.yarnpkg.com/string.prototype.matchall/-/string.prototype.matchall-4.0.11.tgz#1092a72c59268d2abaad76582dccc687c0297e0a"
   integrity sha512-NUdh0aDavY2og7IbBPenWqR9exH+E26Sv8e0/eTe1tltDGZL+GtBkDAnnyBtmekfK6/Dq3MkcGtzXFEd1LQrtg==
